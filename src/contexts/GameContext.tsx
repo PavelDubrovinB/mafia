@@ -43,8 +43,13 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const winner = useMemo(() => {
     if (!gameState) return null
-    if (gameState.mafiaAlive === 0) return 'civilians'
-    if (gameState.mafiaAlive >= gameState.civiliansAlive + (gameState.sheriffAlive ? 1 : 0)) return 'mafia'
+
+    const mafiaAlive = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
+    const civiliansAlive = gameState.alivePlayers.filter((p) => p.role === 'civilian').length
+    const sheriffAlive = gameState.alivePlayers.filter((p) => p.role === 'sheriff').length > 0
+
+    if (mafiaAlive === 0) return 'civilians'
+    if (mafiaAlive >= civiliansAlive + (sheriffAlive ? 1 : 0)) return 'mafia'
     return null
   }, [gameState])
 
@@ -81,9 +86,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       phase: 'game',
       round: 0,
       alivePlayers: players.filter((p) => p.isAlive),
-      mafiaAlive: players.filter((p) => (p.role === 'mafia' || p.role === 'don') && p.isAlive).length,
-      civiliansAlive: players.filter((p) => p.role === 'civilian' && p.isAlive).length,
-      sheriffAlive: players.filter((p) => p.role === 'sheriff' && p.isAlive).length > 0,
     }
     setGameState(newGameState)
     setRoundResults(null)
@@ -110,9 +112,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
             ...prev,
             players: prev.players.map((p) => (p.id === mafiaResult.killed!.id ? { ...p, isAlive: false } : p)),
             alivePlayers: prev.alivePlayers.filter((p) => p.id !== mafiaResult.killed!.id),
-            mafiaAlive: prev.players.filter((p) => (p.role === 'mafia' || p.role === 'don') && p.isAlive).length,
-            civiliansAlive: prev.players.filter((p) => p.role === 'civilian' && p.isAlive).length,
-            sheriffAlive: prev.players.filter((p) => p.role === 'sheriff' && p.isAlive).length > 0,
           }
         })
       }
@@ -141,9 +140,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setRoundResults(null)
     donLogic.resetDonActions()
     sheriffLogic.resetSheriffCheck()
-    setVotingPhase(false) // Возвращаем обычную логику
+    setVotingPhase(false)
     setIsVotingResults(false)
-    setShowNextPlayerScreen(true) // Показываем экран следующего игрока
+    setShowNextPlayerScreen(true)
     setGameState((prev) => {
       if (!prev) return prev
       return {
@@ -181,13 +180,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         ...prev,
         players: prev.players.map((p) => (killedIds.includes(p.id) ? { ...p, isAlive: false } : p)),
         alivePlayers: prev.alivePlayers.filter((p) => !killedIds.includes(p.id)),
-        mafiaAlive: prev.players.filter(
-          (p) => (p.role === 'mafia' || p.role === 'don') && p.isAlive && !killedIds.includes(p.id),
-        ).length,
-        civiliansAlive: prev.players.filter((p) => p.role === 'civilian' && p.isAlive && !killedIds.includes(p.id))
-          .length,
-        sheriffAlive:
-          prev.players.filter((p) => p.role === 'sheriff' && p.isAlive && !killedIds.includes(p.id)).length > 0,
       }
     })
     setVotingPhase(false)

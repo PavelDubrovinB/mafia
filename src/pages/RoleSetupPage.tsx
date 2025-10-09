@@ -26,9 +26,6 @@ const RoleSetupPage: React.FC = () => {
     phase: players.length > 0 ? 'role-reveal' : 'setup',
     round: 0,
     alivePlayers: players.filter((p) => p.isAlive),
-    mafiaAlive: players.filter((p) => (p.role === 'mafia' || p.role === 'don') && p.isAlive).length,
-    civiliansAlive: players.filter((p) => p.role === 'civilian' && p.isAlive).length,
-    sheriffAlive: players.filter((p) => p.role === 'sheriff' && p.isAlive).length > 0,
   })
 
   const [isRevealing, setIsRevealing] = useState(false)

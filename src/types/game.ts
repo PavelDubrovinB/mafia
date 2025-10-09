@@ -14,9 +14,6 @@ export interface GameState {
   phase: 'setup' | 'role-reveal' | 'game' | 'voting' | 'completed'
   round: number
   alivePlayers: Player[]
-  mafiaAlive: number
-  civiliansAlive: number
-  sheriffAlive: boolean
 }
 
 export const ROLE_DESCRIPTIONS = {
