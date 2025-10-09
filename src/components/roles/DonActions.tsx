@@ -21,10 +21,6 @@ const DonActions: React.FC<DonActionsProps> = ({
   onAction,
   onContinue,
 }) => {
-  const killTargets = alivePlayers.filter(
-    (p) => p.id !== currentPlayer.id && (p.role === 'civilian' || p.role === 'sheriff'),
-  )
-
   const checkTargets = alivePlayers.filter((p) => p.id !== currentPlayer.id && p.role !== 'mafia' && p.role !== 'don')
 
   const handleKill = (target: Player) => {
@@ -40,7 +36,7 @@ const DonActions: React.FC<DonActionsProps> = ({
       {!donKilled && (
         <div>
           <p>Убить игрока:</p>
-          {killTargets.map((player) => (
+          {alivePlayers.map((player) => (
             <button key={player.id} onClick={() => handleKill(player)} className="btn btn-secondary">
               {player.name}
             </button>

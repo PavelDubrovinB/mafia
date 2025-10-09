@@ -15,11 +15,13 @@ export interface GameContextType {
   donCheckResult: string | null
   sheriffCheckResult: string | null
   startGame: (playerCount: number) => void
+  startGameWithState: (gameState: GameState) => void
   handlePlayerAction: (action: string, target?: Player) => void
   startNextPlayerTurn: () => void
+  moveToNextPlayer: () => void
   startNextRound: () => void
   startVoting: () => void
-  processVoting: (target: Player) => void
+  processVoting: (targets: Player[]) => void
   startNextGame: () => void
   startNextGameAndClear: () => void
   clearGame: () => void

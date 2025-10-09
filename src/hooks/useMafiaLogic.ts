@@ -26,16 +26,14 @@ export const useMafiaLogic = () => {
           {} as Record<number, number>,
         )
 
-        const maxVotes = Math.max(...Object.values(targetCounts))
-        const killedPlayers = Object.entries(targetCounts)
-          .filter(([, votes]) => votes === maxVotes)
-          .map(([id]) => alivePlayers.find((p) => p.id === parseInt(id))!)
+        const unanimousTarget = Object.entries(targetCounts).find(([, votes]) => votes === mafiaCount)
 
-        if (killedPlayers.length === 1) {
+        if (unanimousTarget) {
+          const killedPlayer = alivePlayers.find((p) => p.id === parseInt(unanimousTarget[0]))!
           return {
             success: true,
-            killed: killedPlayers[0],
-            message: `${killedPlayers[0].name} был убит мафией!`,
+            killed: killedPlayer,
+            message: `${killedPlayer.name} был убит мафией!`,
           }
         } else {
           return {

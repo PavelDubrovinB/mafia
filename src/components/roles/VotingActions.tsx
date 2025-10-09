@@ -1,24 +1,42 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { Player } from '../../types/game'
 
 interface VotingActionsProps {
   alivePlayers: Player[]
-  onAction: (action: string, target?: Player) => void
+  processVoting: (targets: Player[]) => void
 }
 
-const VotingActions: React.FC<VotingActionsProps> = ({ alivePlayers, onAction }) => {
-  const handleVote = (target: Player) => {
-    onAction('vote', target)
+const VotingActions: React.FC<VotingActionsProps> = ({ alivePlayers, processVoting }) => {
+  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([])
+
+  const handlePlayerSelect = (player: Player) => {
+    setSelectedPlayers((prev) =>
+      prev.some((p) => p.id === player.id) ? prev.filter((p) => p.id !== player.id) : [...prev, player],
+    )
   }
+
+  const handleEndVoting = () => {
+    processVoting(selectedPlayers)
+  }
+
   return (
     <div>
-      <p>Выберите игрока для голосования:</p>
-      {alivePlayers.map((player) => (
-        <button key={player.id} onClick={() => handleVote(player)} className="btn btn-secondary">
-          {player.name}
-        </button>
-      ))}
+      <p>Выберите игроков для голосования:</p>
+      <div className="voting-buttons">
+        {alivePlayers.map((player) => (
+          <button
+            key={player.id}
+            onClick={() => handlePlayerSelect(player)}
+            className={`btn ${selectedPlayers.some((p) => p.id === player.id) ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            {player.name}
+          </button>
+        ))}
+      </div>
+      <button onClick={handleEndVoting} className="btn btn-primary">
+        Завершить голосование
+      </button>
     </div>
   )
 }

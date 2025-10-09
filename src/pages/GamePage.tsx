@@ -1,28 +1,19 @@
 import React from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import GameInterface from '../components/GameInterface'
 import { useGameContext } from '../hooks/useGameContext'
 
 const GamePage: React.FC = () => {
-  const location = useLocation()
   const navigate = useNavigate()
-  const playerCount = location.state?.playerCount as number
 
-  const { gameState, startGame } = useGameContext()
-
-  React.useEffect(() => {
-    if (playerCount && !gameState) {
-      startGame(playerCount)
-      navigate('/game', { replace: true })
-    }
-  }, [playerCount, gameState, startGame, navigate])
+  const { gameState } = useGameContext()
 
   const goHome = () => {
     navigate('/')
   }
 
-  if (!playerCount && !gameState) {
+  if (!gameState) {
     return (
       <div className="app">
         <h2>Ошибка</h2>

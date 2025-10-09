@@ -46,8 +46,6 @@ const SetupPage: React.FC = () => {
         <input
           id="playerCount"
           type="number"
-          min="1"
-          max="20"
           value={playerCount || ''}
           onChange={handlePlayerCountChange}
           placeholder="Введите количество игроков"

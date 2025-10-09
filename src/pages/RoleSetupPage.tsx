@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import RoleReveal from '../components/RoleReveal'
+import { useGameContext } from '../hooks/useGameContext'
 import { GameState } from '../types/game'
 import { createPlayers } from '../utils/gameUtils'
 
@@ -9,6 +10,7 @@ const RoleSetupPage: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const initialPlayerCount = location.state?.playerCount as number
+  const { startGameWithState } = useGameContext()
 
   const players = useMemo(() => {
     if (initialPlayerCount && initialPlayerCount >= 4) {
@@ -36,7 +38,13 @@ const RoleSetupPage: React.FC = () => {
   }
 
   const handleStartGame = () => {
-    navigate('/game', { state: { playerCount: initialPlayerCount } })
+    const gameStateWithRoles: GameState = {
+      ...gameState,
+      phase: 'game',
+      currentPlayerIndex: 0,
+    }
+    startGameWithState(gameStateWithRoles)
+    navigate('/game')
   }
 
   const handleContinue = () => {
@@ -64,6 +72,18 @@ const RoleSetupPage: React.FC = () => {
       <div className="app">
         <h2>Ошибка</h2>
         <p>Минимальное количество игроков для игры - 4</p>
+        <button onClick={handleBackToSetup} className="btn btn-secondary">
+          Настройки игры
+        </button>
+      </div>
+    )
+  }
+
+  if (!initialPlayerCount || initialPlayerCount > 15) {
+    return (
+      <div className="app">
+        <h2>Ошибка</h2>
+        <p>Максимальное количество игроков для игры - 15</p>
         <button onClick={handleBackToSetup} className="btn btn-secondary">
           Настройки игры
         </button>
@@ -103,7 +123,6 @@ const RoleSetupPage: React.FC = () => {
     return (
       <div className="app">
         <h2>Роли распределены!</h2>
-        <p>Все игроки узнали свои роли. Теперь можно начинать игру!</p>
 
         <button onClick={handleStartGame} className="btn btn-primary">
           Начать игру

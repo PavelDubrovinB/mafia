@@ -21,10 +21,12 @@ const GameInterface: React.FC = () => {
     sheriffCheckResult,
     handlePlayerAction,
     startNextPlayerTurn,
+    moveToNextPlayer,
     startNextRound,
     startVoting,
     startNextGame,
     startNextGameAndClear,
+    processVoting,
   } = useGameContext()
 
   if (!gameState) {
@@ -32,12 +34,15 @@ const GameInterface: React.FC = () => {
   }
 
   if (showNextPlayerScreen) {
+    const currentPlayer = gameState.alivePlayers[gameState.currentPlayerIndex]
     return (
       <>
-        <h2>Передача хода</h2>
-        <p>Передайте телефон следующему игроку</p>
+        <h2>Круг {gameState.round}</h2>
+        <p>
+          Сейчас ходит: <strong>{currentPlayer?.name}</strong>
+        </p>
         <button onClick={startNextPlayerTurn} className="btn btn-primary">
-          Начать ход
+          Продолжить
         </button>
         <button onClick={startNextGame} className="btn btn-secondary">
           Главное меню
@@ -89,8 +94,7 @@ const GameInterface: React.FC = () => {
     return (
       <>
         <h2>Голосование - Круг {gameState.round}</h2>
-        <p>Выберите игрока которого выгнали:</p>
-        <VotingActions alivePlayers={gameState.alivePlayers} onAction={handlePlayerAction} />
+        <VotingActions alivePlayers={gameState.alivePlayers} processVoting={processVoting} />
       </>
     )
   }
@@ -108,11 +112,7 @@ const GameInterface: React.FC = () => {
       {currentPlayer.role === 'civilian' && <CivilianActions onAction={handlePlayerAction} />}
 
       {currentPlayer.role === 'mafia' && (
-        <MafiaActions
-          currentPlayer={currentPlayer}
-          alivePlayers={gameState.alivePlayers}
-          onAction={handlePlayerAction}
-        />
+        <MafiaActions alivePlayers={gameState.alivePlayers} onAction={handlePlayerAction} />
       )}
 
       {currentPlayer.role === 'don' && (
@@ -123,7 +123,7 @@ const GameInterface: React.FC = () => {
           donChecked={donChecked}
           lastCheckResult={donCheckResult}
           onAction={handlePlayerAction}
-          onContinue={() => startNextPlayerTurn()}
+          onContinue={moveToNextPlayer}
         />
       )}
 
@@ -133,7 +133,7 @@ const GameInterface: React.FC = () => {
           alivePlayers={gameState.alivePlayers}
           lastCheckResult={sheriffCheckResult}
           onAction={handlePlayerAction}
-          onContinue={() => startNextPlayerTurn()}
+          onContinue={moveToNextPlayer}
         />
       )}
     </>
