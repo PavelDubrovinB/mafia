@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { Player } from '../../types/game'
 
@@ -8,8 +8,39 @@ interface MafiaActionsProps {
 }
 
 const MafiaActions: React.FC<MafiaActionsProps> = ({ alivePlayers, onAction }) => {
+  const [selectedTarget, setSelectedTarget] = useState<Player | null>(null)
+
   const handleKill = (target: Player) => {
+    setSelectedTarget(target)
     onAction('kill', target)
+  }
+
+  const handleContinue = () => {
+    setSelectedTarget(null)
+    onAction('continue')
+  }
+
+  const handleCancel = () => {
+    setSelectedTarget(null)
+    onAction('cancel')
+  }
+
+  if (selectedTarget) {
+    return (
+      <div>
+        <p>
+          Вы выбрали: <strong>{selectedTarget.name}</strong>
+        </p>
+        <div className="action-buttons">
+          <button onClick={handleCancel} className="btn btn-secondary">
+            Отменить
+          </button>
+          <button onClick={handleContinue} className="btn btn-primary">
+            Продолжить
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

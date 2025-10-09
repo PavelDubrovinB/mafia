@@ -13,46 +13,48 @@ export const useMafiaLogic = () => {
     setMafiaTargets([])
   }, [])
 
-  const processMafiaKills = useCallback(
-    (alivePlayers: Player[]) => {
-      const mafiaCount = alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
+  const removeLastMafiaTarget = useCallback(() => {
+    setMafiaTargets((prev) => prev.slice(0, -1))
+  }, [])
 
-      if (mafiaTargets.length === mafiaCount) {
-        const targetCounts = mafiaTargets.reduce(
-          (acc, target) => {
-            acc[target.id] = (acc[target.id] || 0) + 1
-            return acc
-          },
-          {} as Record<number, number>,
-        )
+  const processMafiaKills = (alivePlayers: Player[]) => {
+    const mafiaCount = alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
 
-        const unanimousTarget = Object.entries(targetCounts).find(([, votes]) => votes === mafiaCount)
+    if (mafiaTargets.length === mafiaCount) {
+      const targetCounts = mafiaTargets.reduce(
+        (acc, target) => {
+          acc[target.id] = (acc[target.id] || 0) + 1
+          return acc
+        },
+        {} as Record<number, number>,
+      )
 
-        if (unanimousTarget) {
-          const killedPlayer = alivePlayers.find((p) => p.id === parseInt(unanimousTarget[0]))!
-          return {
-            success: true,
-            killed: killedPlayer,
-            message: `${killedPlayer.name} был убит мафией!`,
-          }
-        } else {
-          return {
-            success: false,
-            killed: null,
-            message: 'Мафия не смогла договориться! Никто не был убит.',
-          }
+      const unanimousTarget = Object.entries(targetCounts).find(([, votes]) => votes === mafiaCount)
+
+      if (unanimousTarget) {
+        const killedPlayer = alivePlayers.find((p) => p.id === parseInt(unanimousTarget[0]))!
+        return {
+          success: true,
+          killed: killedPlayer,
+          message: `${killedPlayer.name} был убит мафией!`,
+        }
+      } else {
+        return {
+          success: false,
+          killed: null,
+          message: 'Мафия не смогла договориться! Никто не был убит.',
         }
       }
+    }
 
-      return null
-    },
-    [mafiaTargets],
-  )
+    return null
+  }
 
   return {
     mafiaTargets,
     addMafiaTarget,
     clearMafiaTargets,
+    removeLastMafiaTarget,
     processMafiaKills,
   }
 }

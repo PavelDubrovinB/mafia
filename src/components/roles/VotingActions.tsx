@@ -22,7 +22,6 @@ const VotingActions: React.FC<VotingActionsProps> = ({ alivePlayers, processVoti
 
   return (
     <div>
-      <p>Выберите игроков для голосования:</p>
       <div className="voting-buttons">
         {alivePlayers.map((player) => (
           <button

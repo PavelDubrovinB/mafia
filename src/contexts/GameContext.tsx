@@ -79,7 +79,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       players,
       currentPlayerIndex: 0,
       phase: 'game',
-      round: 1,
+      round: 0,
       alivePlayers: players.filter((p) => p.isAlive),
       mafiaAlive: players.filter((p) => (p.role === 'mafia' || p.role === 'don') && p.isAlive).length,
       civiliansAlive: players.filter((p) => p.role === 'civilian' && p.isAlive).length,
@@ -87,8 +87,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     }
     setGameState(newGameState)
     setRoundResults(null)
-    setShowNextPlayerScreen(true)
-    setVotingPhase(false)
+    setShowNextPlayerScreen(false)
+    setVotingPhase(true)
     setIsVotingResults(false)
     mafiaLogic.clearMafiaTargets()
     donLogic.resetDonActions()
@@ -141,9 +141,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setRoundResults(null)
     donLogic.resetDonActions()
     sheriffLogic.resetSheriffCheck()
-    setVotingPhase(false)
+    setVotingPhase(false) // Возвращаем обычную логику
     setIsVotingResults(false)
-    setShowNextPlayerScreen(true)
+    setShowNextPlayerScreen(true) // Показываем экран следующего игрока
     setGameState((prev) => {
       if (!prev) return prev
       return {
@@ -192,6 +192,15 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     })
     setVotingPhase(false)
     setIsVotingResults(true)
+
+    setGameState((prev) => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        round: prev.round + 1,
+        currentPlayerIndex: 0,
+      }
+    })
   }
 
   const startNextGame = () => {
@@ -234,38 +243,88 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const handlePlayerAction = (action: string, target?: Player) => {
     if (!currentPlayer) return
+    const shouldMoveToNext = processPlayerAction(action, target)
 
-    if (action === 'continue') {
-      sheriffLogic.resetSheriffCheck()
+    if (shouldMoveToNext) {
       moveToNextPlayer()
-    } else if (action === 'kill' && target) {
-      if (currentPlayer.role === 'don') {
-        mafiaLogic.addMafiaTarget(target)
-        donLogic.performKill(target)
-        if (donLogic.canContinue()) {
-          moveToNextPlayer()
+    }
+  }
+
+  const processContinueAction = (): boolean => {
+    sheriffLogic.resetSheriffCheck()
+    return true
+  }
+
+  const processCancelAction = (): boolean => {
+    if (currentPlayer?.role === 'mafia' || currentPlayer?.role === 'don') {
+      mafiaLogic.removeLastMafiaTarget()
+    }
+    return false
+  }
+
+  const processKillAction = (target: Player): boolean => {
+    if (currentPlayer?.role === 'don') {
+      mafiaLogic.addMafiaTarget(target)
+      donLogic.performKill(target)
+      return donLogic.canContinue()
+    } else if (currentPlayer?.role === 'mafia') {
+      mafiaLogic.addMafiaTarget(target)
+      sheriffLogic.resetSheriffCheck()
+      return false
+    }
+    return false
+  }
+
+  const processCheckAction = (target: Player): boolean => {
+    if (currentPlayer?.role === 'don') {
+      donLogic.performCheck(target)
+    } else if (currentPlayer?.role === 'sheriff') {
+      sheriffLogic.performCheck(target)
+    }
+    return false
+  }
+
+  const processPlayerAction = (action: string, target?: Player): boolean => {
+    if (!currentPlayer) return false
+
+    switch (action) {
+      case 'continue':
+        return processContinueAction()
+
+      case 'cancel':
+        return processCancelAction()
+
+      case 'kill':
+        if (!target) return false
+        return processKillAction(target)
+
+      case 'check':
+        if (!target) return false
+        return processCheckAction(target)
+
+      case 'vote':
+        if (target) {
+          processVoting([target])
         }
-      } else {
-        mafiaLogic.addMafiaTarget(target)
-        sheriffLogic.resetSheriffCheck()
-        moveToNextPlayer()
-      }
-    } else if (action === 'check' && target) {
-      if (currentPlayer.role === 'don') {
-        donLogic.performCheck(target)
-      } else if (currentPlayer.role === 'sheriff') {
-        sheriffLogic.performCheck(target)
-      }
-    } else if (action === 'vote' && target) {
-      processVoting([target])
+        return false
+
+      default:
+        return false
     }
   }
 
   const startGameWithState = (gameState: GameState) => {
     setGameState(gameState)
     setRoundResults(null)
-    setShowNextPlayerScreen(true)
-    setVotingPhase(false)
+
+    if (gameState.round === 0) {
+      setShowNextPlayerScreen(false)
+      setVotingPhase(true)
+    } else {
+      setShowNextPlayerScreen(true)
+      setVotingPhase(false)
+    }
+
     setIsVotingResults(false)
     mafiaLogic.clearMafiaTargets()
     donLogic.resetDonActions()

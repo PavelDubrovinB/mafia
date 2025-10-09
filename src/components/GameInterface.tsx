@@ -52,10 +52,33 @@ const GameInterface: React.FC = () => {
   }
 
   if (winner) {
+    const mafiaTeam = gameState.players.filter((p) => p.role === 'mafia' || p.role === 'don')
+    const sheriff = gameState.players.find((p) => p.role === 'sheriff')
+    const don = gameState.players.find((p) => p.role === 'don')
+
     return (
       <>
         <h2>Игра окончена!</h2>
         <p>Победили: {winner === 'civilians' ? 'Мирные жители' : 'Мафия'}</p>
+
+        <div className="game-results">
+          <h4>
+            Команда мафии: <strong>{mafiaTeam.map((player) => player.id).join(', ')}</strong>
+          </h4>
+
+          {don && (
+            <h4>
+              Дон: <strong>{don.id}</strong>
+            </h4>
+          )}
+
+          {sheriff && (
+            <h4>
+              Шериф: <strong>{sheriff.id}</strong>
+            </h4>
+          )}
+        </div>
+
         <button onClick={startNextGameAndClear} className="btn btn-secondary">
           Главное меню
         </button>
