@@ -23,9 +23,8 @@ const SetupPage: React.FC = () => {
 
   const handleStartGame = () => {
     if (playerCount > 0) {
-      navigate('/roles', {
-        state: { playerCount },
-      })
+      clearGame()
+      navigate('/roles', { state: { playerCount } })
     }
   }
 

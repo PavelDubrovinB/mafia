@@ -32,7 +32,7 @@ const RoleReveal: React.FC<RoleRevealProps> = ({ currentPlayer, onContinue, onRo
     <>
       <h2>Показ ролей</h2>
       <p>
-        Сейчас узнает свою роль: <strong>{currentPlayer.name}</strong>
+        <strong>{currentPlayer.name}</strong>
       </p>
       <button onClick={onContinue} className="btn btn-primary">
         Продолжить

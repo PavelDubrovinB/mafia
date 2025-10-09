@@ -36,7 +36,7 @@ const RoleSetupPage: React.FC = () => {
   }
 
   const handleStartGame = () => {
-    navigate('/game')
+    navigate('/game', { state: { playerCount: initialPlayerCount } })
   }
 
   const handleContinue = () => {
@@ -105,14 +105,12 @@ const RoleSetupPage: React.FC = () => {
         <h2>Роли распределены!</h2>
         <p>Все игроки узнали свои роли. Теперь можно начинать игру!</p>
 
-        <div className="game-controls">
-          <button onClick={handleBackToSetup} className="btn btn-secondary">
-            Настройки игры
-          </button>
-          <button onClick={handleStartGame} className="btn btn-primary">
-            Начать игру
-          </button>
-        </div>
+        <button onClick={handleStartGame} className="btn btn-primary">
+          Начать игру
+        </button>
+        <button onClick={handleBackToSetup} className="btn btn-secondary">
+          Настройки игры
+        </button>
       </div>
     )
   }

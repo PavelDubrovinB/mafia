@@ -68,8 +68,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (gameState) {
-      saveToStorage(gameState)
+      return saveToStorage(gameState)
     }
+
+    clearStorage()
   }, [gameState])
 
   const startGame = (playerCount: number) => {
@@ -87,7 +89,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     }
     setGameState(newGameState)
     setRoundResults(null)
-    setShowNextPlayerScreen(false)
+    setShowNextPlayerScreen(true)
     setVotingPhase(false)
     setIsVotingResults(false)
     mafiaLogic.clearMafiaTargets()

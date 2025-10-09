@@ -86,22 +86,6 @@ p {
   font-size: 1.2rem;
 }
 
-.game-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 2rem;
-  width: 100%;
-}
-
-.game-controls .btn {
-  margin-top: 0;
-  flex: 1;
-  min-width: 120px;
-}
-
 .btn {
   padding: 12px 30px;
   border: none;
