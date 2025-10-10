@@ -27,9 +27,9 @@ const GameInterface: React.FC = () => {
   const {
     gameState,
     roundResults,
+    votingResults,
     showNextPlayerScreen,
     votingPhase,
-    isVotingResults,
     currentPlayer,
     winner,
     donKilled,
@@ -48,22 +48,6 @@ const GameInterface: React.FC = () => {
 
   if (!gameState) {
     return <div>Загрузка игры...</div>
-  }
-
-  if (showNextPlayerScreen) {
-    const currentPlayer = gameState.alivePlayers[gameState.currentPlayerIndex]
-    return (
-      <>
-        <MenuButton onClick={startNextGame} />
-        <h2>Круг {gameState.round}</h2>
-        <p>
-          Сейчас ходит: <strong>{currentPlayer?.name}</strong>
-        </p>
-        <button onClick={startNextPlayerTurn} className="btn btn-primary">
-          Продолжить
-        </button>
-      </>
-    )
   }
 
   if (winner) {
@@ -103,22 +87,6 @@ const GameInterface: React.FC = () => {
   }
 
   if (roundResults) {
-    if (isVotingResults) {
-      return (
-        <>
-          <MenuButton onClick={startNextGame} />
-          <h2>Круг {gameState.round}</h2>
-          <p>Результаты голосования</p>
-          <div className="round-results">
-            <p>{roundResults}</p>
-            <button onClick={startNextRound} className="btn btn-primary">
-              Следующий круг
-            </button>
-          </div>
-        </>
-      )
-    }
-
     return (
       <>
         <MenuButton onClick={startNextGame} />
@@ -134,6 +102,22 @@ const GameInterface: React.FC = () => {
     )
   }
 
+  if (votingResults) {
+    return (
+      <>
+        <MenuButton onClick={startNextGame} />
+        <h2>Круг {gameState.round}</h2>
+        <p>Результаты голосования</p>
+        <div className="round-results">
+          <p>{votingResults}</p>
+          <button onClick={startNextRound} className="btn btn-primary">
+            Следующий круг
+          </button>
+        </div>
+      </>
+    )
+  }
+
   if (votingPhase) {
     return (
       <>
@@ -141,6 +125,22 @@ const GameInterface: React.FC = () => {
         <h2>Круг {gameState.round}</h2>
         <p>Голосование</p>
         <VotingActions alivePlayers={gameState.alivePlayers} processVoting={processVoting} />
+      </>
+    )
+  }
+
+  if (showNextPlayerScreen) {
+    const currentPlayer = gameState.alivePlayers[gameState.currentPlayerIndex]
+    return (
+      <>
+        <MenuButton onClick={startNextGame} />
+        <h2>Круг {gameState.round}</h2>
+        <p>
+          Сейчас ходит: <strong>{currentPlayer?.name}</strong>
+        </p>
+        <button onClick={startNextPlayerTurn} className="btn btn-primary">
+          Продолжить
+        </button>
       </>
     )
   }
