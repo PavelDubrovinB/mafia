@@ -80,7 +80,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const startGame = (playerCount: number) => {
     const players = createPlayers(playerCount)
     const newGameState: GameState = {
-      playerCount,
       players,
       currentPlayerIndex: 0,
       phase: 'game',
@@ -120,14 +119,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     mafiaLogic.clearMafiaTargets()
     donLogic.resetDonActions()
     sheriffLogic.resetSheriffCheck()
-
-    setGameState((prev) => {
-      if (!prev) return prev
-      return {
-        ...prev,
-        currentPlayerIndex: 0,
-      }
-    })
   }
 
   const startNextPlayerTurn = () => {
@@ -156,10 +147,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const startVoting = () => {
     setVotingPhase(true)
     setRoundResults(null)
-    setGameState((prev) => {
-      if (!prev) return prev
-      return { ...prev, currentPlayerIndex: 0 }
-    })
   }
 
   const processVoting = (targets: Player[]) => {
@@ -184,24 +171,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     })
     setVotingPhase(false)
     setIsVotingResults(true)
-
-    setGameState((prev) => {
-      if (!prev) return prev
-      return {
-        ...prev,
-        round: prev.round + 1,
-        currentPlayerIndex: 0,
-      }
-    })
-  }
-
-  const startNextGame = () => {
-    navigate('/')
-  }
-
-  const startNextGameAndClear = () => {
-    clearGame()
-    navigate('/')
   }
 
   const clearGame = () => {
@@ -214,6 +183,15 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     donLogic.resetDonActions()
     sheriffLogic.resetSheriffCheck()
     clearStorage()
+  }
+
+  const startNextGame = () => {
+    navigate('/')
+  }
+
+  const startNextGameAndClear = () => {
+    clearGame()
+    navigate('/')
   }
 
   const moveToNextPlayer = () => {

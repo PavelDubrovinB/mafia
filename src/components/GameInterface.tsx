@@ -109,10 +109,6 @@ const GameInterface: React.FC = () => {
     )
   }
 
-  if (!currentPlayer) {
-    return <div>Загрузка...</div>
-  }
-
   if (votingPhase) {
     return (
       <>
@@ -120,6 +116,10 @@ const GameInterface: React.FC = () => {
         <VotingActions alivePlayers={gameState.alivePlayers} processVoting={processVoting} />
       </>
     )
+  }
+
+  if (!currentPlayer) {
+    return <div>Загрузка...</div>
   }
 
   return (

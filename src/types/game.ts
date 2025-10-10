@@ -8,7 +8,6 @@ export interface Player {
 export type Role = 'mafia' | 'don' | 'sheriff' | 'civilian'
 
 export interface GameState {
-  playerCount: number
   players: Player[]
   currentPlayerIndex: number
   phase: 'setup' | 'role-reveal' | 'game' | 'voting' | 'completed'

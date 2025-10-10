@@ -20,7 +20,6 @@ const RoleSetupPage: React.FC = () => {
   }, [initialPlayerCount])
 
   const [gameState, setGameState] = useState<GameState>({
-    playerCount: initialPlayerCount || 0,
     players,
     currentPlayerIndex: 0,
     phase: players.length > 0 ? 'role-reveal' : 'setup',
