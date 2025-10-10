@@ -37,13 +37,13 @@ body {
 
 h2 {
   margin: 0.5rem 0;
-  font-size: 2.9rem;
+  font-size: 2.5rem;
   font-weight: 700;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 p {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   margin: 0.5rem 0;
 }
 
@@ -87,10 +87,10 @@ p {
 }
 
 .btn {
-  padding: 12px 30px;
+  padding: 10px 25px;
   border: none;
   border-radius: 10px;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -163,7 +163,7 @@ p {
 }
 
 .role-name {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
   margin-bottom: 1rem;
   letter-spacing: 2px;
@@ -195,7 +195,7 @@ p {
 }
 
 .round-results p {
-  font-size: 1.9rem;
+  font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #fff;

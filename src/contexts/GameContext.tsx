@@ -158,7 +158,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     }
 
     const killedIds = targets.map((t) => t.id)
-    const message = 'Игроки исключены из игры'
+    const message = `${killedIds.sort((a, b) => a - b).join(', ')} были исключены из игры`
 
     setRoundResults(message)
     setGameState((prev) => {

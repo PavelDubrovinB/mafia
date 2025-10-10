@@ -32,11 +32,11 @@ const MafiaActions: React.FC<MafiaActionsProps> = ({ alivePlayers, onAction }) =
           Вы выбрали: <strong>{selectedTarget.name}</strong>
         </p>
         <div className="action-buttons">
-          <button onClick={handleCancel} className="btn btn-secondary">
-            Отменить
-          </button>
           <button onClick={handleContinue} className="btn btn-primary">
             Продолжить
+          </button>
+          <button onClick={handleCancel} className="btn btn-secondary">
+            Отменить
           </button>
         </div>
       </div>

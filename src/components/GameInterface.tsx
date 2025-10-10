@@ -87,20 +87,33 @@ const GameInterface: React.FC = () => {
   }
 
   if (roundResults) {
+    if (isVotingResults) {
+      return (
+        <>
+          <h2>Круг {gameState.round}</h2>
+          <p>Результаты голосования</p>
+          <div className="round-results">
+            <p>{roundResults}</p>
+            <button onClick={startNextRound} className="btn btn-primary">
+              Следующий круг
+            </button>
+            <button onClick={startNextGame} className="btn btn-secondary">
+              Главное меню
+            </button>
+          </div>
+        </>
+      )
+    }
+
     return (
       <>
-        <h2>Результаты круга {gameState.round}</h2>
+        <h2>Круг {gameState.round}</h2>
+        <p>Результат мафии</p>
         <div className="round-results">
           <p>{roundResults}</p>
-          {isVotingResults ? (
-            <button onClick={startNextRound} className="btn btn-primary">
-              Начать следующий круг
-            </button>
-          ) : (
-            <button onClick={startVoting} className="btn btn-primary">
-              Начать голосование
-            </button>
-          )}
+          <button onClick={startVoting} className="btn btn-primary">
+            Начать голосование
+          </button>
           <button onClick={startNextGame} className="btn btn-secondary">
             Главное меню
           </button>
@@ -112,7 +125,8 @@ const GameInterface: React.FC = () => {
   if (votingPhase) {
     return (
       <>
-        <h2>Голосование - Круг {gameState.round}</h2>
+        <h2>Круг {gameState.round}</h2>
+        <p>Голосование</p>
         <VotingActions alivePlayers={gameState.alivePlayers} processVoting={processVoting} />
       </>
     )

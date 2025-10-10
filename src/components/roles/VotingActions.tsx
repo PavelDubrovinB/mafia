@@ -34,7 +34,7 @@ const VotingActions: React.FC<VotingActionsProps> = ({ alivePlayers, processVoti
         ))}
       </div>
       <button onClick={handleEndVoting} className="btn btn-primary">
-        Завершить голосование
+        Продолжить
       </button>
     </div>
   )
