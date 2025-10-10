@@ -9,11 +9,11 @@ export interface GameContextType {
   showNextPlayerScreen: boolean
   votingPhase: boolean
   currentPlayer: Player | null
-  winner: string | null
   donKilled: boolean
   donChecked: boolean
   donCheckResult: string | null
   sheriffCheckResult: string | null
+  getWinner: () => string | null
   startGameWithState: (gameState: GameState) => void
   handlePlayerAction: (action: string, target?: Player) => void
   startNextPlayerTurn: () => void

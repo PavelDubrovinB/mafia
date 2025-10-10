@@ -1,18 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 interface CivilianActionsProps {
   onAction: (action: string) => void
 }
 
 const CivilianActions: React.FC<CivilianActionsProps> = ({ onAction }) => {
+  const [isLoading, setIsLoading] = useState(false)
   const handleContinue = () => {
-    onAction('continue')
+    setIsLoading(true)
+    setTimeout(() => {
+      onAction('continue')
+      setIsLoading(false)
+    }, 2000)
   }
 
   return (
     <div>
       <button onClick={handleContinue} className="btn btn-primary">
-        Продолжить
+        {isLoading ? 'Загрузка...' : 'Продолжить'}
       </button>
     </div>
   )

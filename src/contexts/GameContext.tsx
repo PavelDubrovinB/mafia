@@ -50,7 +50,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const navigate = useNavigate()
 
-  const mafiaLogic = useMafiaLogic()
+  const mafiaLogic = useMafiaLogic(gameState)
   const donLogic = useDonLogic()
   const sheriffLogic = useSheriffLogic()
 
@@ -59,7 +59,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     return gameState.alivePlayers[gameState.currentPlayerIndex] || null
   }, [gameState])
 
-  const winner = useMemo(() => {
+  const getWinner = useCallback(() => {
     if (!gameState) return null
 
     const mafiaAlive = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
@@ -70,6 +70,12 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     if (mafiaAlive >= civiliansAlive + (sheriffAlive ? 1 : 0)) return 'mafia'
     return null
   }, [gameState])
+
+  const checkWinnerAndNavigate = useCallback(() => {
+    if (getWinner()) {
+      navigate('/results')
+    }
+  }, [getWinner, navigate])
 
   const saveToStorage = (state: GameState) => {
     try {
@@ -106,28 +112,32 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   }
 
   const startNextRound = useCallback(() => {
-    setRoundResults(null)
-    setShowNextPlayerScreen(true)
-    donLogic.resetDonActions()
-    sheriffLogic.resetSheriffCheck()
-    saveVotingPhaseState(false)
-    saveVotingResultsState(null)
-    setGameState((prev) => {
-      if (!prev) return prev
-      return {
-        ...prev,
-        currentPlayerIndex: 0,
-        round: prev.round + 1,
+    checkWinnerAndNavigate()
+
+    setTimeout(() => {
+      setRoundResults(null)
+      setShowNextPlayerScreen(true)
+      donLogic.resetDonActions()
+      sheriffLogic.resetSheriffCheck()
+      saveVotingPhaseState(false)
+      saveVotingResultsState(null)
+      setGameState((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          currentPlayerIndex: 0,
+          round: prev.round + 1,
+        }
+      })
+      if (gameState) {
+        mafiaLogic.cleanupMafiaTargets()
       }
-    })
-    if (gameState) {
-      mafiaLogic.cleanupMafiaTargets(gameState.alivePlayers)
-    }
-  }, [donLogic, sheriffLogic, gameState, mafiaLogic])
+    }, 500)
+  }, [donLogic, sheriffLogic, gameState, mafiaLogic, checkWinnerAndNavigate])
 
   useEffect(() => {
     if (gameState) {
-      mafiaLogic.initializeMafiaTargets(gameState.alivePlayers)
+      mafiaLogic.initializeMafiaTargets()
       return saveToStorage(gameState)
     }
 
@@ -168,8 +178,12 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   }
 
   const startVoting = () => {
-    saveVotingPhaseState(true)
-    setRoundResults(null)
+    checkWinnerAndNavigate()
+
+    setTimeout(() => {
+      saveVotingPhaseState(true)
+      setRoundResults(null)
+    }, 500)
   }
 
   const processVoting = (targets: Player[]) => {
@@ -258,11 +272,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     if (!gameState?.alivePlayers) return false
 
     if (currentPlayer?.role === 'don') {
-      mafiaLogic.addMafiaTarget(target, gameState?.alivePlayers, currentPlayer)
+      mafiaLogic.addMafiaTarget(target, currentPlayer)
       donLogic.performKill(target)
       return donLogic.canContinue()
     } else if (currentPlayer?.role === 'mafia') {
-      mafiaLogic.addMafiaTarget(target, gameState?.alivePlayers, currentPlayer)
+      mafiaLogic.addMafiaTarget(target, currentPlayer)
       sheriffLogic.resetSheriffCheck()
       return false
     }
@@ -318,7 +332,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       saveVotingPhaseState(false)
     }
 
-    mafiaLogic.initializeMafiaTargets(gameState.alivePlayers)
+    mafiaLogic.initializeMafiaTargets()
     donLogic.resetDonActions()
     sheriffLogic.resetSheriffCheck()
   }
@@ -330,11 +344,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     showNextPlayerScreen,
     votingPhase,
     currentPlayer,
-    winner,
     donKilled: donLogic.donKilled,
     donChecked: donLogic.donChecked,
     donCheckResult: donLogic.donCheckResult,
     sheriffCheckResult: sheriffLogic.sheriffCheckResult,
+    getWinner,
     startGameWithState,
     handlePlayerAction,
     startNextPlayerTurn,

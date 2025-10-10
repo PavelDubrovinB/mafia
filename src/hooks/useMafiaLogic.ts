@@ -2,17 +2,18 @@ import { useCallback, useState } from 'react'
 
 import { MAFIA_STORAGE_KEY } from '~/contexts/GameContext'
 
-import { Player } from '../types/game'
+import { GameState, Player } from '../types/game'
 
-export const useMafiaLogic = () => {
+export const useMafiaLogic = (gameState: GameState | null) => {
   const [mafiaTargets, setMafiaTargets] = useState<Player[]>([])
 
-  const initializeMafiaTargets = useCallback((alivePlayers: Player[]) => {
+  const initializeMafiaTargets = useCallback(() => {
+    if (!gameState) return
     try {
       const saved = localStorage.getItem(MAFIA_STORAGE_KEY)
       if (saved) {
         const loadedTargets = JSON.parse(saved)
-        const mafiaCount = alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
+        const mafiaCount = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
 
         if (loadedTargets.length > mafiaCount) {
           const cleanedTargets = loadedTargets.slice(-mafiaCount)
@@ -26,10 +27,11 @@ export const useMafiaLogic = () => {
       console.error('Failed to load mafia targets:', error)
       setMafiaTargets([])
     }
-  }, [])
+  }, [gameState])
 
-  const cleanupMafiaTargets = useCallback((alivePlayers: Player[]) => {
-    const mafiaCount = alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
+  const cleanupMafiaTargets = useCallback(() => {
+    if (!gameState) return
+    const mafiaCount = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
 
     setMafiaTargets((prev) => {
       if (prev.length > mafiaCount) {
@@ -39,31 +41,35 @@ export const useMafiaLogic = () => {
       }
       return prev
     })
-  }, [])
+  }, [gameState])
 
-  const addMafiaTarget = useCallback((target: Player, alivePlayers: Player[], currentPlayer: Player) => {
-    setMafiaTargets((prev) => {
-      const mafiaCount = alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
-      const mafiaPlayers = alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don')
-      const currentPlayerIndex = mafiaPlayers.findIndex((p) => p.id === currentPlayer.id)
+  const addMafiaTarget = useCallback(
+    (target: Player, currentPlayer: Player) => {
+      if (!gameState) return
+      setMafiaTargets((prev) => {
+        const mafiaCount = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
+        const mafiaPlayers = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don')
+        const currentPlayerIndex = mafiaPlayers.findIndex((p) => p.id === currentPlayer.id)
 
-      let cleanedPrev = prev
-      if (prev.length > mafiaCount) {
-        cleanedPrev = prev.slice(-mafiaCount)
-      }
+        let cleanedPrev = prev
+        if (prev.length > mafiaCount) {
+          cleanedPrev = prev.slice(-mafiaCount)
+        }
 
-      if (cleanedPrev.length > currentPlayerIndex) {
-        const newTargets = [...cleanedPrev]
-        newTargets[currentPlayerIndex] = target
+        if (cleanedPrev.length > currentPlayerIndex) {
+          const newTargets = [...cleanedPrev]
+          newTargets[currentPlayerIndex] = target
+          localStorage.setItem(MAFIA_STORAGE_KEY, JSON.stringify(newTargets))
+          return newTargets
+        }
+
+        const newTargets = [...cleanedPrev, target]
         localStorage.setItem(MAFIA_STORAGE_KEY, JSON.stringify(newTargets))
         return newTargets
-      }
-
-      const newTargets = [...cleanedPrev, target]
-      localStorage.setItem(MAFIA_STORAGE_KEY, JSON.stringify(newTargets))
-      return newTargets
-    })
-  }, [])
+      })
+    },
+    [gameState],
+  )
 
   const clearMafiaTargets = useCallback(() => {
     setMafiaTargets([])
