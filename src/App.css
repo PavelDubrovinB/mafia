@@ -21,18 +21,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
 
-.app {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 0 1rem;
 }
 
 h2 {
@@ -45,6 +36,16 @@ h2 {
 p {
   font-size: 1.5rem;
   margin: 0.5rem 0;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100vh;
+  padding: 0 1rem;
 }
 
 .game-info {
@@ -105,22 +106,10 @@ p {
   box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 }
 
-.btn-primary:hover {
-  background: #45a049;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-}
-
 .btn-secondary {
   background: #2196f3;
   color: white;
   box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-}
-
-.btn-secondary:hover {
-  background: #1976d2;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
 }
 
 .game-container p {

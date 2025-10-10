@@ -6,6 +6,23 @@ import { getRoleColor } from '../utils/roleUtils'
 
 import { CivilianActions, DonActions, MafiaActions, SheriffActions, VotingActions } from './roles'
 
+const MenuButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+  <button
+    onClick={onClick}
+    className="btn btn-secondary"
+    style={{
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      zIndex: 1000,
+      fontSize: '14px',
+      padding: '8px 16px',
+    }}
+  >
+    Главное меню
+  </button>
+)
+
 const GameInterface: React.FC = () => {
   const {
     gameState,
@@ -37,15 +54,13 @@ const GameInterface: React.FC = () => {
     const currentPlayer = gameState.alivePlayers[gameState.currentPlayerIndex]
     return (
       <>
+        <MenuButton onClick={startNextGame} />
         <h2>Круг {gameState.round}</h2>
         <p>
           Сейчас ходит: <strong>{currentPlayer?.name}</strong>
         </p>
         <button onClick={startNextPlayerTurn} className="btn btn-primary">
           Продолжить
-        </button>
-        <button onClick={startNextGame} className="btn btn-secondary">
-          Главное меню
         </button>
       </>
     )
@@ -58,6 +73,7 @@ const GameInterface: React.FC = () => {
 
     return (
       <>
+        <MenuButton onClick={startNextGame} />
         <h2>Игра окончена!</h2>
         <p>Победили: {winner === 'civilians' ? 'Мирные жители' : 'Мафия'}</p>
 
@@ -79,8 +95,8 @@ const GameInterface: React.FC = () => {
           )}
         </div>
 
-        <button onClick={startNextGameAndClear} className="btn btn-secondary">
-          Главное меню
+        <button onClick={startNextGameAndClear} className="btn btn-primary">
+          Новая игра
         </button>
       </>
     )
@@ -90,15 +106,13 @@ const GameInterface: React.FC = () => {
     if (isVotingResults) {
       return (
         <>
+          <MenuButton onClick={startNextGame} />
           <h2>Круг {gameState.round}</h2>
           <p>Результаты голосования</p>
           <div className="round-results">
             <p>{roundResults}</p>
             <button onClick={startNextRound} className="btn btn-primary">
               Следующий круг
-            </button>
-            <button onClick={startNextGame} className="btn btn-secondary">
-              Главное меню
             </button>
           </div>
         </>
@@ -107,15 +121,13 @@ const GameInterface: React.FC = () => {
 
     return (
       <>
+        <MenuButton onClick={startNextGame} />
         <h2>Круг {gameState.round}</h2>
         <p>Результат мафии</p>
         <div className="round-results">
           <p>{roundResults}</p>
-          <button onClick={startVoting} className="btn btn-primary">
+          <button onClick={startVoting} className="btn btn-primary mt-4">
             Начать голосование
-          </button>
-          <button onClick={startNextGame} className="btn btn-secondary">
-            Главное меню
           </button>
         </div>
       </>
@@ -125,6 +137,7 @@ const GameInterface: React.FC = () => {
   if (votingPhase) {
     return (
       <>
+        <MenuButton onClick={startNextGame} />
         <h2>Круг {gameState.round}</h2>
         <p>Голосование</p>
         <VotingActions alivePlayers={gameState.alivePlayers} processVoting={processVoting} />
@@ -138,6 +151,7 @@ const GameInterface: React.FC = () => {
 
   return (
     <>
+      <MenuButton onClick={startNextGame} />
       <h2>Круг {gameState.round}</h2>
       <p>
         Сейчас ходит: <strong>{currentPlayer.name}</strong>
