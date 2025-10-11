@@ -10,6 +10,11 @@ import RoleSetupPage from './pages/RoleSetupPage'
 import SetupPage from './pages/SetupPage'
 
 const App: React.FC = () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(() => {
+      console.log('SW registered')
+    })
+  }
   return (
     <Router>
       <GameProvider>
