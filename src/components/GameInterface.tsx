@@ -4,24 +4,8 @@ import { useGameContext } from '../hooks/useGameContext'
 import { ROLE_DESCRIPTIONS } from '../types/game'
 import { getRoleColor } from '../utils/roleUtils'
 
+import { MenuButton } from './MenuButton'
 import { CivilianActions, DonActions, MafiaActions, SheriffActions, VotingActions } from './roles'
-
-const MenuButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <button
-    onClick={onClick}
-    className="btn btn-secondary"
-    style={{
-      position: 'fixed',
-      top: '20px',
-      right: '20px',
-      zIndex: 1000,
-      fontSize: '14px',
-      padding: '8px 16px',
-    }}
-  >
-    Главное меню
-  </button>
-)
 
 const GameInterface: React.FC = () => {
   const {

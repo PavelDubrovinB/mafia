@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+import { MenuButton } from '~/components/MenuButton'
+
 import RoleReveal from '../components/RoleReveal'
 import { useGameContext } from '../hooks/useGameContext'
 import { GameState } from '../types/game'
@@ -69,7 +71,7 @@ const RoleSetupPage: React.FC = () => {
         <h2>Ошибка</h2>
         <p>Минимальное количество игроков для игры - 4</p>
         <button onClick={handleBackToSetup} className="btn btn-secondary">
-          Настройки игры
+          Главная
         </button>
       </div>
     )
@@ -81,7 +83,7 @@ const RoleSetupPage: React.FC = () => {
         <h2>Ошибка</h2>
         <p>Максимальное количество игроков для игры - 15</p>
         <button onClick={handleBackToSetup} className="btn btn-secondary">
-          Настройки игры
+          Главная
         </button>
       </div>
     )
@@ -118,13 +120,11 @@ const RoleSetupPage: React.FC = () => {
   if (gameState.phase === 'completed') {
     return (
       <div className="app">
+        <MenuButton onClick={handleBackToSetup} />
         <h2>Роли распределены!</h2>
 
         <button onClick={handleStartGame} className="btn btn-primary">
           Начать игру
-        </button>
-        <button onClick={handleBackToSetup} className="btn btn-secondary">
-          Настройки игры
         </button>
       </div>
     )
