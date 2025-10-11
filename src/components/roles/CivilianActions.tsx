@@ -16,7 +16,7 @@ const CivilianActions: React.FC<CivilianActionsProps> = ({ onAction }) => {
 
   return (
     <div>
-      <button onClick={handleContinue} className="btn btn-primary">
+      <button onClick={handleContinue} disabled={isLoading} className="btn btn-primary">
         {isLoading ? 'Загрузка...' : 'Продолжить'}
       </button>
     </div>
