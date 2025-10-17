@@ -55,19 +55,22 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const sheriffLogic = useSheriffLogic()
 
   const currentPlayer = useMemo(() => {
-    if (!gameState || !gameState.alivePlayers.length) return null
-    return gameState.alivePlayers[gameState.currentPlayerIndex] || null
+    if (!gameState) return null
+    const alivePlayers = gameState.players.filter((p) => p.isAlive)
+    if (!alivePlayers.length) return null
+    return alivePlayers[gameState.currentPlayerIndex] || null
   }, [gameState])
 
   const getWinner = useCallback(() => {
     if (!gameState) return null
 
-    const mafiaAlive = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
-    const civiliansAlive = gameState.alivePlayers.filter((p) => p.role === 'civilian').length
-    const sheriffAlive = gameState.alivePlayers.filter((p) => p.role === 'sheriff').length > 0
+    const alivePlayers = gameState.players.filter((p) => p.isAlive)
+    const mafiaAlive = alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
+    const civiliansAlive = alivePlayers.filter((p) => p.role === 'civilian').length
+    const sheriffAlive = alivePlayers.filter((p) => p.role === 'sheriff').length > 0 ? 1 : 0
 
     if (mafiaAlive === 0) return 'civilians'
-    if (mafiaAlive >= civiliansAlive + (sheriffAlive ? 1 : 0)) return 'mafia'
+    if (mafiaAlive >= civiliansAlive + sheriffAlive) return 'mafia'
     return null
   }, [gameState])
 
@@ -132,7 +135,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       if (gameState) {
         mafiaLogic.cleanupMafiaTargets()
       }
-    }, 500)
+    }, 400)
   }, [donLogic, sheriffLogic, gameState, mafiaLogic, checkWinnerAndNavigate])
 
   useEffect(() => {
@@ -148,7 +151,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const processRoundResults = () => {
     if (!gameState) return
 
-    const mafiaResult = mafiaLogic.processMafiaKills(gameState.alivePlayers)
+    const mafiaResult = mafiaLogic.processMafiaKills(gameState.players)
 
     if (mafiaResult) {
       setRoundResults(mafiaResult.message)
@@ -160,7 +163,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
           return {
             ...prev,
             players: prev.players.map((p) => (p.id === mafiaResult.killed!.id ? { ...p, isAlive: false } : p)),
-            alivePlayers: prev.alivePlayers.filter((p) => p.id !== mafiaResult.killed!.id),
           }
         })
       }
@@ -183,27 +185,26 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setTimeout(() => {
       saveVotingPhaseState(true)
       setRoundResults(null)
-    }, 500)
+    }, 400)
   }
 
   const processVoting = (targets: Player[]) => {
-    if (targets.length === 0) {
+    if (targets.length === 0 || targets.every((t) => !t.isAlive)) {
       const message = 'Никто не был исключен из игры'
       saveVotingResultsState(message)
       saveVotingPhaseState(false)
       return
     }
 
-    const killedIds = targets.map((t) => t.id)
-    const message = `${killedIds.sort((a, b) => a - b).join(', ')} были исключены из игры`
+    const aliveKilledIds = targets.filter((t) => t.isAlive).map((t) => t.id)
+    const message = `${aliveKilledIds.sort((a, b) => a - b).join(', ')} были исключены из игры`
 
     saveVotingResultsState(message)
     setGameState((prev) => {
       if (!prev) return prev
       return {
         ...prev,
-        players: prev.players.map((p) => (killedIds.includes(p.id) ? { ...p, isAlive: false } : p)),
-        alivePlayers: prev.alivePlayers.filter((p) => !killedIds.includes(p.id)),
+        players: prev.players.map((p) => (aliveKilledIds.includes(p.id) ? { ...p, isAlive: false } : p)),
       }
     })
     saveVotingPhaseState(false)
@@ -233,7 +234,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const moveToNextPlayer = () => {
     if (!gameState) return
 
-    if (gameState.currentPlayerIndex < gameState.alivePlayers.length - 1) {
+    const alivePlayers = gameState.players.filter((p) => p.isAlive)
+    if (gameState.currentPlayerIndex < alivePlayers.length - 1) {
       setGameState((prev) => {
         if (!prev) return prev
         return {
@@ -269,7 +271,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   }
 
   const processKillAction = (target: Player): boolean => {
-    if (!gameState?.alivePlayers) return false
+    if (!gameState) return false
 
     if (currentPlayer?.role === 'don') {
       mafiaLogic.addMafiaTarget(target, currentPlayer)

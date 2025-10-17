@@ -70,13 +70,13 @@ const GameInterface: React.FC = () => {
         <MenuButton onClick={startNextGame} />
         <h2>Круг {gameState.round}</h2>
         <p>Голосование</p>
-        <VotingActions alivePlayers={gameState.alivePlayers} processVoting={processVoting} />
+        <VotingActions players={gameState.players} processVoting={processVoting} />
       </>
     )
   }
 
   if (showNextPlayerScreen) {
-    const currentPlayer = gameState.alivePlayers[gameState.currentPlayerIndex]
+    const currentPlayer = gameState.players.filter((p) => p.isAlive)[gameState.currentPlayerIndex]
     return (
       <>
         <MenuButton onClick={startNextGame} />
@@ -108,14 +108,12 @@ const GameInterface: React.FC = () => {
 
       {currentPlayer.role === 'civilian' && <CivilianActions onAction={handlePlayerAction} />}
 
-      {currentPlayer.role === 'mafia' && (
-        <MafiaActions alivePlayers={gameState.alivePlayers} onAction={handlePlayerAction} />
-      )}
+      {currentPlayer.role === 'mafia' && <MafiaActions players={gameState.players} onAction={handlePlayerAction} />}
 
       {currentPlayer.role === 'don' && (
         <DonActions
-          currentPlayer={currentPlayer}
-          alivePlayers={gameState.alivePlayers}
+          // currentPlayer={currentPlayer}
+          players={gameState.players}
           donKilled={donKilled}
           donChecked={donChecked}
           lastCheckResult={donCheckResult}
@@ -126,8 +124,8 @@ const GameInterface: React.FC = () => {
 
       {currentPlayer.role === 'sheriff' && (
         <SheriffActions
-          currentPlayer={currentPlayer}
-          alivePlayers={gameState.alivePlayers}
+          // currentPlayer={currentPlayer}
+          players={gameState.players}
           lastCheckResult={sheriffCheckResult}
           onAction={handlePlayerAction}
           onContinue={moveToNextPlayer}

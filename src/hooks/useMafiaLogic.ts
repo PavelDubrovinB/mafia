@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 
+import { getMafiaKilledMessage, getMafiaMissedMessage, MISS_PLAYER_Id } from '~/const'
 import { MAFIA_STORAGE_KEY } from '~/contexts/GameContext'
 
 import { GameState, Player } from '../types/game'
@@ -13,10 +14,12 @@ export const useMafiaLogic = (gameState: GameState | null) => {
       const saved = localStorage.getItem(MAFIA_STORAGE_KEY)
       if (saved) {
         const loadedTargets = JSON.parse(saved)
-        const mafiaCount = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
+        const aliveMafiaCount = gameState.players.filter(
+          (p) => p.isAlive && (p.role === 'mafia' || p.role === 'don'),
+        ).length
 
-        if (loadedTargets.length > mafiaCount) {
-          const cleanedTargets = loadedTargets.slice(-mafiaCount)
+        if (loadedTargets.length > aliveMafiaCount) {
+          const cleanedTargets = loadedTargets.slice(-aliveMafiaCount)
           localStorage.setItem(MAFIA_STORAGE_KEY, JSON.stringify(cleanedTargets))
           setMafiaTargets(cleanedTargets)
         } else {
@@ -31,11 +34,13 @@ export const useMafiaLogic = (gameState: GameState | null) => {
 
   const cleanupMafiaTargets = useCallback(() => {
     if (!gameState) return
-    const mafiaCount = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
+    const aliveMafiaCount = gameState.players.filter(
+      (p) => p.isAlive && (p.role === 'mafia' || p.role === 'don'),
+    ).length
 
     setMafiaTargets((prev) => {
-      if (prev.length > mafiaCount) {
-        const cleanedTargets = prev.slice(-mafiaCount)
+      if (prev.length > aliveMafiaCount) {
+        const cleanedTargets = prev.slice(-aliveMafiaCount)
         localStorage.setItem(MAFIA_STORAGE_KEY, JSON.stringify(cleanedTargets))
         return cleanedTargets
       }
@@ -47,13 +52,13 @@ export const useMafiaLogic = (gameState: GameState | null) => {
     (target: Player, currentPlayer: Player) => {
       if (!gameState) return
       setMafiaTargets((prev) => {
-        const mafiaCount = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
-        const mafiaPlayers = gameState.alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don')
-        const currentPlayerIndex = mafiaPlayers.findIndex((p) => p.id === currentPlayer.id)
+        const aliveMafiaPlayers = gameState.players.filter((p) => p.isAlive && (p.role === 'mafia' || p.role === 'don'))
+        const aliveMafiaCount = aliveMafiaPlayers.length
+        const currentPlayerIndex = aliveMafiaPlayers.findIndex((p) => p.id === currentPlayer.id)
 
         let cleanedPrev = prev
-        if (prev.length > mafiaCount) {
-          cleanedPrev = prev.slice(-mafiaCount)
+        if (prev.length > aliveMafiaCount) {
+          cleanedPrev = prev.slice(-aliveMafiaCount)
         }
 
         if (cleanedPrev.length > currentPlayerIndex) {
@@ -84,10 +89,20 @@ export const useMafiaLogic = (gameState: GameState | null) => {
     })
   }, [])
 
-  const processMafiaKills = (alivePlayers: Player[]) => {
-    const mafiaCount = alivePlayers.filter((p) => p.role === 'mafia' || p.role === 'don').length
+  const processMafiaKills = (players: Player[]) => {
+    const aliveMafiaCount = players.filter((p) => p.isAlive && (p.role === 'mafia' || p.role === 'don')).length
 
-    if (mafiaTargets.length === mafiaCount) {
+    if (mafiaTargets.length === aliveMafiaCount) {
+      const hasMissPlayer = mafiaTargets.some((target) => target.id === MISS_PLAYER_Id)
+
+      if (hasMissPlayer) {
+        return {
+          success: false,
+          killed: null,
+          message: getMafiaMissedMessage(),
+        }
+      }
+
       const targetCounts = mafiaTargets.reduce(
         (acc, target) => {
           acc[target.id] = (acc[target.id] || 0) + 1
@@ -96,20 +111,29 @@ export const useMafiaLogic = (gameState: GameState | null) => {
         {} as Record<number, number>,
       )
 
-      const unanimousTarget = Object.entries(targetCounts).find(([, votes]) => votes === mafiaCount)
+      const unanimousTarget = Object.entries(targetCounts).find(([, votes]) => votes === aliveMafiaCount)
 
       if (unanimousTarget) {
-        const killedPlayer = alivePlayers.find((p) => p.id === parseInt(unanimousTarget[0]))!
+        const killedPlayer = players.find((p) => p.id === parseInt(unanimousTarget[0]))!
+
+        if (!killedPlayer.isAlive) {
+          return {
+            success: false,
+            killed: null,
+            message: getMafiaMissedMessage(),
+          }
+        }
+
         return {
           success: true,
           killed: killedPlayer,
-          message: `${killedPlayer.name} был убит мафией!`,
+          message: getMafiaKilledMessage(killedPlayer.name),
         }
       } else {
         return {
           success: false,
           killed: null,
-          message: 'Мафия не смогла договориться! Никто не был убит.',
+          message: getMafiaMissedMessage(),
         }
       }
     }

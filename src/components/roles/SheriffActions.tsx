@@ -3,21 +3,21 @@ import React from 'react'
 import { Player } from '../../types/game'
 
 interface SheriffActionsProps {
-  currentPlayer: Player
-  alivePlayers: Player[]
+  // currentPlayer: Player
+  players: Player[]
   lastCheckResult: string | null
   onAction: (action: string, target?: Player) => void
   onContinue: () => void
 }
 
 const SheriffActions: React.FC<SheriffActionsProps> = ({
-  currentPlayer,
-  alivePlayers,
+  // currentPlayer,
+  players,
   lastCheckResult,
   onAction,
   onContinue,
 }) => {
-  const targets = alivePlayers.filter((p) => p.id !== currentPlayer.id)
+  // const targets = alivePlayers.filter((p) => p.id !== currentPlayer.id)
 
   const handleCheck = (target: Player) => {
     onAction('check', target)
@@ -28,11 +28,17 @@ const SheriffActions: React.FC<SheriffActionsProps> = ({
       {!lastCheckResult ? (
         <>
           <p>Проверьте игрока на мафию:</p>
-          {targets.map((player) => (
-            <button key={player.id} onClick={() => handleCheck(player)} className="btn btn-secondary">
-              {player.name}
-            </button>
-          ))}
+          <div className="player-buttons">
+            {players.map((player) => (
+              <button
+                key={player.id}
+                onClick={() => handleCheck(player)}
+                className={`btn btn-secondary ${!player.isAlive ? 'dead-player' : ''}`}
+              >
+                {player.name}
+              </button>
+            ))}
+          </div>
         </>
       ) : (
         <div className="check-result">
