@@ -1,10 +1,12 @@
 import React from 'react'
 
+import { MISS_PLAYER } from '~/const'
+
 import { Player } from '../../types/game'
 
 interface DonActionsProps {
-  currentPlayer: Player
-  alivePlayers: Player[]
+  // currentPlayer: Player
+  players: Player[]
   donKilled: boolean
   donChecked: boolean
   lastCheckResult: string | null
@@ -13,15 +15,15 @@ interface DonActionsProps {
 }
 
 const DonActions: React.FC<DonActionsProps> = ({
-  currentPlayer,
-  alivePlayers,
+  // currentPlayer,
+  players,
   donKilled,
   donChecked,
   lastCheckResult,
   onAction,
   onContinue,
 }) => {
-  const checkTargets = alivePlayers.filter((p) => p.id !== currentPlayer.id && p.role !== 'mafia' && p.role !== 'don')
+  // const checkTargets = alivePlayers.filter((p) => p.id !== currentPlayer.id && p.role !== 'mafia' && p.role !== 'don')
 
   const handleKill = (target: Player) => {
     onAction('kill', target)
@@ -36,22 +38,37 @@ const DonActions: React.FC<DonActionsProps> = ({
       {!donKilled && (
         <div>
           <p>Убить игрока:</p>
-          {alivePlayers.map((player) => (
-            <button key={player.id} onClick={() => handleKill(player)} className="btn btn-secondary">
-              {player.name}
+          <div className="player-buttons">
+            {players.map((player) => (
+              <button
+                key={player.id}
+                onClick={() => handleKill(player)}
+                className={`btn btn-secondary ${!player.isAlive ? 'dead-player' : ''}`}
+              >
+                {player.name}
+              </button>
+            ))}
+            <button key="continue" onClick={() => handleKill(MISS_PLAYER)} className="btn btn-secondary">
+              {MISS_PLAYER.name}
             </button>
-          ))}
+          </div>
         </div>
       )}
 
       {!donChecked && (
         <div>
           <p>Проверить игрока на шерифа:</p>
-          {checkTargets.map((player) => (
-            <button key={player.id} onClick={() => handleCheck(player)} className="btn btn-secondary">
-              {player.name}
-            </button>
-          ))}
+          <div className="player-buttons">
+            {players.map((player) => (
+              <button
+                key={player.id}
+                onClick={() => handleCheck(player)}
+                className={`btn btn-secondary ${!player.isAlive ? 'dead-player' : ''}`}
+              >
+                {player.name}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

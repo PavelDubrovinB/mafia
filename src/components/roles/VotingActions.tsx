@@ -3,11 +3,11 @@ import React, { useState } from 'react'
 import { Player } from '../../types/game'
 
 interface VotingActionsProps {
-  alivePlayers: Player[]
+  players: Player[]
   processVoting: (targets: Player[]) => void
 }
 
-const VotingActions: React.FC<VotingActionsProps> = ({ alivePlayers, processVoting }) => {
+const VotingActions: React.FC<VotingActionsProps> = ({ players, processVoting }) => {
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([])
 
   const handlePlayerSelect = (player: Player) => {
@@ -23,11 +23,11 @@ const VotingActions: React.FC<VotingActionsProps> = ({ alivePlayers, processVoti
   return (
     <div>
       <div className="voting-buttons">
-        {alivePlayers.map((player) => (
+        {players.map((player) => (
           <button
             key={player.id}
             onClick={() => handlePlayerSelect(player)}
-            className={`btn ${selectedPlayers.some((p) => p.id === player.id) ? 'btn-primary' : 'btn-secondary'}`}
+            className={`btn ${selectedPlayers.some((p) => p.id === player.id) ? 'btn-primary' : 'btn-secondary'} ${!player.isAlive ? 'dead-player' : ''}`}
           >
             {player.name}
           </button>

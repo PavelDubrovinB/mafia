@@ -12,7 +12,6 @@ export interface GameState {
   currentPlayerIndex: number
   phase: 'setup' | 'role-reveal' | 'game' | 'voting' | 'completed'
   round: number
-  alivePlayers: Player[]
 }
 
 export const ROLE_DESCRIPTIONS = {

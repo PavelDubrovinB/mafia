@@ -26,7 +26,6 @@ const RoleSetupPage: React.FC = () => {
     currentPlayerIndex: 0,
     phase: players.length > 0 ? 'role-reveal' : 'setup',
     round: 0,
-    alivePlayers: players.filter((p) => p.isAlive),
   })
 
   const [isRevealing, setIsRevealing] = useState(false)

@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 
+import { MISS_PLAYER } from '~/const'
+
 import { Player } from '../../types/game'
 
 interface MafiaActionsProps {
-  alivePlayers: Player[]
+  players: Player[]
   onAction: (action: string, target?: Player) => void
 }
 
-const MafiaActions: React.FC<MafiaActionsProps> = ({ alivePlayers, onAction }) => {
+const MafiaActions: React.FC<MafiaActionsProps> = ({ players, onAction }) => {
   const [selectedTarget, setSelectedTarget] = useState<Player | null>(null)
 
   const handleKill = (target: Player) => {
@@ -46,11 +48,20 @@ const MafiaActions: React.FC<MafiaActionsProps> = ({ alivePlayers, onAction }) =
   return (
     <div>
       <p>Выберите кого убить:</p>
-      {alivePlayers.map((player) => (
-        <button key={player.id} onClick={() => handleKill(player)} className="btn btn-secondary">
-          {player.name}
+      <div className="player-buttons">
+        {players.map((player) => (
+          <button
+            key={player.id}
+            onClick={() => handleKill(player)}
+            className={`btn btn-secondary ${!player.isAlive ? 'dead-player' : ''}`}
+          >
+            {player.name}
+          </button>
+        ))}
+        <button key="continue" onClick={() => handleKill(MISS_PLAYER)} className="btn btn-secondary">
+          {MISS_PLAYER.name}
         </button>
-      ))}
+      </div>
     </div>
   )
 }
