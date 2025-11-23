@@ -11,7 +11,7 @@ export const generatePlayerNames = (count: number): string[] => {
 export const distributeRoles = (playerCount: number): Role[] => {
   const roles: Role[] = []
 
-  roles.push('mafia')
+  // roles.push('mafia')
   roles.push('mafia')
   roles.push('don')
   roles.push('sheriff')
